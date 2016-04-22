@@ -36,8 +36,15 @@ my $rss = XML::RSS->new;
 $rss -> parse( $content );
 
 foreach my $item ( @{$rss -> {'items'}} ){
-  my $pubdate = DateTime::Format::HTTP->parse_datetime($item->{'pubDate'});
-  if(($pubdate->epoch > ($TIME - $INTERVAL)) ||
+  my $pdate;
+  if($item->{'pubDate'}) {
+    $pdate = DateTime::Format::HTTP->parse_datetime($item->{'pubDate'});
+  } elsif ( $item->{'dc'}->{'date'} ) {
+    $pdate = DateTime::Format::HTTP->parse_datetime($item->{'dc'}->{'date'});
+  } else {
+    die "unknown Time.\n";
+  }
+  if(($pdate->epoch > ($TIME - $INTERVAL)) ||
      ( $INTERVAL == 0)) {
     print '"' . Encode::encode('utf8', $item->{'title'}),"\" $item->{'link'}\n";
   }else{ exit }
