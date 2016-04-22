@@ -14,6 +14,8 @@ use warnings;
 use Encode;
 use LWP::Simple;
 use XML::RSS;
+use DateTime::Format::HTTP;
+
 
 my $RSS = 'https://ask.libreoffice.org/ja/feeds/rss/';
 my $INTERVAL = 300;
@@ -25,10 +27,9 @@ my $rss = XML::RSS->new;
 $rss -> parse( $content );
 
 foreach my $item ( @{$rss -> {'items'}} ){
-  my $date  = `printf \`date --date='$item->{'pubDate'}' +%s\``;
-  my $now_time = `printf \`date +%s\``;
-  if($date > ($now_time-$INTERVAL) ){
-    print Encode::encode('utf8', $item->{'title'})," $item->{'link'}\n";
+  my $pubdate = DateTime::Format::HTTP->parse_datetime($item->{'pubDate'});
+  if($pubdate->epoch > (time - $INTERVAL) ){
+    print '"' . Encode::encode('utf8', $item->{'title'}),"\" $item->{'link'}\n";
   }else{ exit }
 }
 

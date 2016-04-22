@@ -13,5 +13,6 @@ $ ./rss2tw.pl | tw
 
 ## Debian stretch
 
+`libwww-perl`
 `libxml-rss-perl`
-
+`libdatetime-format-http-perl`
