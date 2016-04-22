@@ -13,47 +13,22 @@ use strict;
 use warnings;
 use Encode;
 use LWP::Simple;
-use XML::RSSLite;
+use XML::RSS;
 
 my $RSS = 'https://ask.libreoffice.org/ja/feeds/rss/';
+my $INTERVAL = 300;
 
 my $content = get( $RSS );
 die "Couldn't get it!" unless defined $content;
 
-my %result;
-parseRSS(\%result, \$content);
+my $rss = XML::RSS->new;
+$rss -> parse( $content );
 
-foreach my $item (@{$result{'item'}}) {
-print "  --- Item ---\n",
-  "  Title: $item->{'title'}\n",
-#  "  Desc:  $item->{'description'}\n",
-  "  Link:  $item->{'link'}\n",
-  "  pubDate:  $item->{'pubDate'}\n\n";
-
+foreach my $item ( @{$rss -> {'items'}} ){
   my $date  = `printf \`date --date='$item->{'pubDate'}' +%s\``;
   my $now_time = `printf \`date +%s\``;
-  if($date > ($now_time-600000) ){
-    print Encode::encode('utf8', $item->{'title'})," $item->{'link'}";
-#     print "$item->{'title'} $item->{'link'}\n";
+  if($date > ($now_time-$INTERVAL) ){
+    print Encode::encode('utf8', $item->{'title'})," $item->{'link'}\n";
   }else{ exit }
-}
-
-
-__DATA__
-
-my ($title, $link)= ('', '');
-foreach my $line ( `curl -s -S $RSS | xmllint --format - | egrep '<title>|<link>|<pubDate>' | tail -n +3 | cut -c7-` ){
-  chomp $line;
-  if(    $line =~/\<title\>/   ){ $title = $line; $title =~s/<[^>]*>//g; }
-  elsif( $line =~/\<link\>/    ){ $link  = $line; $link  =~s/<[^>]*>//g; }
-  elsif( $line =~/\<pubDate\>/ ){
-    $line=~s/<[^>]*>//g;
-    my $date  = `printf \`date --date='$line' +%s\``;
-    my $now_time = `printf \`date +%s\``;
-
-    if($date > ($now_time-300) ){
-      print "$title $link\n";
-    }else{ exit }
-  }else{ print "error\n" }
 }
 

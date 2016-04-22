@@ -9,4 +9,9 @@ IFTTTによるTwitter自動投稿の試験 http://ask.libreoffice.org/ja/questio
 $ ./rss2tw.pl | tw
 ```
 
+# 必要pkg
+
+## Debian stretch
+
+`libxml-rss-perl`
 
