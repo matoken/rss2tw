@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 
-# 引数に指定したRSSから指定秒以内のtitle/urlを表示
+# 引数に指定したRSSと秒数から指定秒以内のtitle/urlを表示
+# 指定秒が0の場合全てのエントリ分を表示
 # crontabで定期的に実行してtw.plやttytterに繋ぐのを想定
 #
 #   $ ./rss2tw.pl http://matoken.org/blog/feed/rss/ 999999
@@ -35,7 +36,8 @@ $rss -> parse( $content );
 
 foreach my $item ( @{$rss -> {'items'}} ){
   my $pubdate = DateTime::Format::HTTP->parse_datetime($item->{'pubDate'});
-  if($pubdate->epoch > (time - $INTERVAL) ){
+  if(($pubdate->epoch > (time - $INTERVAL)) ||
+     ( $INTERVAL == 0)) {
     print '"' . Encode::encode('utf8', $item->{'title'}),"\" $item->{'link'}\n";
   }else{ exit }
 }

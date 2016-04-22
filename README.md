@@ -1,6 +1,7 @@
 # rss2tw
 
 引数に指定したRSSから指定秒以内のtitle/urlを表示  
+指定秒が0の場合全てのエントリ分を表示  
 crontabで定期的に実行してtw.plやttytterに繋ぐのを想定
 
 ```
