@@ -18,6 +18,7 @@ use XML::RSS;
 use DateTime::Format::HTTP;
 use Scalar::Util qw(looks_like_number);
 
+my $TIME = time;
 
 if (@ARGV != 2) {
   die "USAGE: $0 rss interval(Second)\n";
@@ -29,14 +30,14 @@ if (!looks_like_number $INTERVAL){
 }
 
 my $content = get( $RSS );
-die "Couldn't get it!" unless defined $content;
+die "RSS Couldn't get it!" unless defined $content;
 
 my $rss = XML::RSS->new;
 $rss -> parse( $content );
 
 foreach my $item ( @{$rss -> {'items'}} ){
   my $pubdate = DateTime::Format::HTTP->parse_datetime($item->{'pubDate'});
-  if(($pubdate->epoch > (time - $INTERVAL)) ||
+  if(($pubdate->epoch > ($TIME - $INTERVAL)) ||
      ( $INTERVAL == 0)) {
     print '"' . Encode::encode('utf8', $item->{'title'}),"\" $item->{'link'}\n";
   }else{ exit }
